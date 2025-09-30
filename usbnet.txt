@@ -1,0 +1,14 @@
+# setup udev rules to create a friendly network interface name
+cat /etc/udev/rules.d/70-my-usb-net.rules 
+SUBSYSTEM=="net", ACTION=="add", ATTRS{idVendor}=="04b3", ATTRS{idProduct}=="4010", NAME="usbnet0"
+
+root@rem2vm:~# cat usbnet0.sh 
+ip link
+udevadm info -a -p /sys/class/net/ens192u4u1c2
+vim /etc/udev/rules.d/70-my-usb-net.rules
+udevadm control --reload-rules
+udevadm trigger
+ip link
+nmcli connection add type ethernet con-name usbnet-conn ifname usbnet0 ipv4.method manual ipv4.addresses 10.11.99.14/24
+nmcli connection up usbnet-conn
+ping 10.11.99.1
